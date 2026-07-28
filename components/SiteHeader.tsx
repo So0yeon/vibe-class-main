@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { HeaderActions } from "@/components/HeaderActions";
+import { VisitorCounter } from "@/components/VisitorCounter";
 import type { AboutContent } from "@/lib/about";
 
 type Props = {
@@ -35,6 +36,7 @@ export function SiteHeader({ about }: Props) {
             <p className="mt-3 max-w-xl text-sm leading-relaxed text-slate-400 sm:mt-4 sm:text-base">
               초등교사가 직접 만든 바이브코딩 웹앱 수업자료 아카이브
             </p>
+            <VisitorCounter />
           </div>
 
           <HeaderActions about={about} />

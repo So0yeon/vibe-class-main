@@ -178,3 +178,63 @@ grant execute on function public.increment_view(text) to anon, authenticated;
 grant execute on function public.increment_like(text) to anon, authenticated;
 grant execute on function public.add_comment(text, text, text) to anon, authenticated;
 grant execute on function public.report_comment(bigint) to anon, authenticated;
+
+-- ---------------------------------------------------------------------------
+-- Site Visitor Tracking: 오늘/누적 방문자 수
+-- ---------------------------------------------------------------------------
+
+create table if not exists public.site_visits (
+  date date primary key default current_date,
+  count integer not null default 0
+);
+
+alter table public.site_visits enable row level security;
+
+drop policy if exists "site_visits_public_read" on public.site_visits;
+create policy "site_visits_public_read" on public.site_visits
+  for select using (true);
+
+grant select on public.site_visits to anon, authenticated;
+
+-- 방문 기록: 오늘 날짜 카운트를 +1 하고 오늘/누적 집계를 반환
+create or replace function public.record_site_visit()
+returns table (today_count integer, total_count integer)
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_today integer;
+  v_total integer;
+begin
+  insert into public.site_visits (date, count) values (current_date, 1)
+  on conflict (date) do update set count = site_visits.count + 1
+  returning site_visits.count into v_today;
+
+  select coalesce(sum(count), 0)::integer into v_total from public.site_visits;
+
+  today_count := v_today;
+  total_count := v_total;
+  return next;
+end;
+$$;
+
+-- 방문 기록 없이 현재 집계만 조회
+create or replace function public.get_site_visitor_stats()
+returns table (today_count integer, total_count integer)
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  return query
+  select
+    coalesce((select count from public.site_visits where date = current_date), 0)::integer,
+    coalesce((select sum(count)::integer from public.site_visits), 0);
+end;
+$$;
+
+revoke all on function public.record_site_visit() from public;
+revoke all on function public.get_site_visitor_stats() from public;
+grant execute on function public.record_site_visit() to anon, authenticated;
+grant execute on function public.get_site_visitor_stats() to anon, authenticated;

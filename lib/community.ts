@@ -1,5 +1,8 @@
 import { getSupabaseClient } from "@/lib/supabase";
 
+/** 댓글 작성/삭제 시 updateTag(COMMENTS_CACHE_TAG)로 댓글·통계 캐시를 비운다 */
+export const COMMENTS_CACHE_TAG = "comments";
+
 export type ProgramStats = {
   views: number;
   likes: number;
@@ -43,7 +46,7 @@ export async function getAllProgramStats(): Promise<{
   stats: Record<string, ProgramStats>;
   available: boolean;
 }> {
-  const supabase = getSupabaseClient();
+  const supabase = getSupabaseClient({ tags: [COMMENTS_CACHE_TAG] });
   if (!supabase) return { stats: {}, available: false };
 
   try {
@@ -72,7 +75,7 @@ export async function getAllProgramStats(): Promise<{
 export async function getProgramStats(
   programId: string,
 ): Promise<{ stats: ProgramStats; available: boolean }> {
-  const supabase = getSupabaseClient();
+  const supabase = getSupabaseClient({ tags: [COMMENTS_CACHE_TAG] });
   if (!supabase) return { stats: ZERO_STATS, available: false };
 
   try {
@@ -103,7 +106,7 @@ export async function getProgramStats(
 export async function getComments(
   programId: string,
 ): Promise<{ comments: CommentItem[]; available: boolean }> {
-  const supabase = getSupabaseClient();
+  const supabase = getSupabaseClient({ tags: [COMMENTS_CACHE_TAG] });
   if (!supabase) return { comments: [], available: false };
 
   try {

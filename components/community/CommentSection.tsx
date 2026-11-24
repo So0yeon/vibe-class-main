@@ -1,7 +1,12 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { addComment, reportComment } from "@/lib/actions/community";
+import {
+  addComment,
+  deleteCommentAsAdmin,
+  deleteCommentWithPassword,
+  reportComment,
+} from "@/lib/actions/community";
 import type { CommentItem } from "@/lib/community";
 import { CommentForm } from "@/components/community/CommentForm";
 import { CommentListItem } from "@/components/community/CommentListItem";
@@ -35,12 +40,14 @@ type Props = {
   programId: string;
   initialComments: CommentItem[];
   commentsAvailable: boolean;
+  isAdmin?: boolean;
 };
 
 export function CommentSection({
   programId,
   initialComments,
   commentsAvailable,
+  isAdmin = false,
 }: Props) {
   const [comments, setComments] = useState(initialComments);
   const [reportedIds, setReportedIds] = useState<Set<number>>(
@@ -50,7 +57,11 @@ export function CommentSection({
   const [isSubmitting, startSubmitTransition] = useTransition();
   const [, startReportTransition] = useTransition();
 
-  const handleAddComment = (nickname: string, content: string) => {
+  const handleAddComment = (
+    nickname: string,
+    content: string,
+    password: string,
+  ) => {
     const trimmed = content.trim();
     if (!trimmed) return;
 
@@ -66,7 +77,7 @@ export function CommentSection({
     setComments((prev) => [optimisticComment, ...prev]);
 
     startSubmitTransition(async () => {
-      const result = await addComment(programId, nickname, content);
+      const result = await addComment(programId, nickname, content, password);
       if ("error" in result) {
         setComments((prev) => prev.filter((c) => c.id !== tempId));
         setFormError(result.error);
@@ -90,6 +101,20 @@ export function CommentSection({
         setComments((prev) => prev.filter((c) => c.id !== commentId));
       }
     });
+  };
+
+  /** 성공하면 목록에서 빼고 null, 실패하면 오류 문구를 돌려준다 */
+  const handleDelete = async (
+    commentId: number,
+    password: string | null,
+  ): Promise<string | null> => {
+    const result =
+      password === null
+        ? await deleteCommentAsAdmin(commentId)
+        : await deleteCommentWithPassword(commentId, password);
+    if ("error" in result) return result.error;
+    setComments((prev) => prev.filter((c) => c.id !== commentId));
+    return null;
   };
 
   return (
@@ -124,6 +149,8 @@ export function CommentSection({
               comment={comment}
               alreadyReported={reportedIds.has(comment.id)}
               onReport={handleReport}
+              onDelete={handleDelete}
+              isAdmin={isAdmin}
             />
           ))}
         </ul>

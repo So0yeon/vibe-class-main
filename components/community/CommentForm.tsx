@@ -4,9 +4,10 @@ import { useState, type KeyboardEvent } from "react";
 
 const CONTENT_MAX_LENGTH = 500;
 const NICKNAME_MAX_LENGTH = 30;
+const PASSWORD_MAX_LENGTH = 50;
 
 type Props = {
-  onSubmit: (nickname: string, content: string) => void;
+  onSubmit: (nickname: string, content: string, password: string) => void;
   pending: boolean;
   error?: string | null;
 };
@@ -14,13 +15,15 @@ type Props = {
 export function CommentForm({ onSubmit, pending, error }: Props) {
   const [nickname, setNickname] = useState("");
   const [content, setContent] = useState("");
+  const [password, setPassword] = useState("");
 
   const canSubmit = content.trim().length > 0 && !pending;
 
   const submit = () => {
     if (!canSubmit) return;
-    onSubmit(nickname, content);
+    onSubmit(nickname, content, password);
     setContent("");
+    setPassword("");
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -32,17 +35,31 @@ export function CommentForm({ onSubmit, pending, error }: Props) {
 
   return (
     <div className="rounded-xl border border-slate-600/50 bg-slate-800/40 p-4">
-      <input
-        type="text"
-        value={nickname}
-        onChange={(e) =>
-          setNickname(e.target.value.slice(0, NICKNAME_MAX_LENGTH))
-        }
-        placeholder="닉네임 (선택, 비워두면 익명 선생님)"
-        disabled={pending}
-        maxLength={NICKNAME_MAX_LENGTH}
-        className="mb-2 w-full rounded-lg border border-slate-600/50 bg-slate-900/50 px-3 py-2 text-sm text-slate-200 placeholder:text-slate-500 transition focus:border-cyan-500/50 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 disabled:opacity-50"
-      />
+      <div className="mb-2 grid gap-2 sm:grid-cols-2">
+        <input
+          type="text"
+          value={nickname}
+          onChange={(e) =>
+            setNickname(e.target.value.slice(0, NICKNAME_MAX_LENGTH))
+          }
+          placeholder="닉네임 (선택, 비워두면 익명 선생님)"
+          disabled={pending}
+          maxLength={NICKNAME_MAX_LENGTH}
+          className="w-full rounded-lg border border-slate-600/50 bg-slate-900/50 px-3 py-2 text-sm text-slate-200 placeholder:text-slate-500 transition focus:border-cyan-500/50 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 disabled:opacity-50"
+        />
+        <input
+          type="password"
+          value={password}
+          onChange={(e) =>
+            setPassword(e.target.value.slice(0, PASSWORD_MAX_LENGTH))
+          }
+          placeholder="비밀번호 (선택, 내 댓글 삭제용)"
+          autoComplete="new-password"
+          disabled={pending}
+          maxLength={PASSWORD_MAX_LENGTH}
+          className="w-full rounded-lg border border-slate-600/50 bg-slate-900/50 px-3 py-2 text-sm text-slate-200 placeholder:text-slate-500 transition focus:border-cyan-500/50 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 disabled:opacity-50"
+        />
+      </div>
       <textarea
         value={content}
         onChange={(e) =>

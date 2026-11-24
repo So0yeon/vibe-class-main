@@ -6,6 +6,7 @@ import { CommentSection } from "@/components/community/CommentSection";
 import { ProgramStats } from "@/components/community/ProgramStats";
 import { PlayButton } from "@/components/game/PlayButton";
 import { WorksheetLinks } from "@/components/game/WorksheetLinks";
+import { isAdmin } from "@/lib/admin/auth";
 import { getComments, getProgramStats } from "@/lib/community";
 import { buildMetaPills, formatGameDate } from "@/lib/games";
 import { getGameById } from "@/lib/games-data";
@@ -70,8 +71,8 @@ export default async function ProgramPage({ params }: Props) {
 
   if (!game) notFound();
 
-  const [{ stats }, { comments, available: commentsAvailable }] =
-    await Promise.all([getProgramStats(id), getComments(id)]);
+  const [{ stats }, { comments, available: commentsAvailable }, admin] =
+    await Promise.all([getProgramStats(id), getComments(id), isAdmin()]);
 
   const metaPills = buildMetaPills(game);
   const formattedDate = formatGameDate(game.date);
@@ -175,6 +176,7 @@ export default async function ProgramPage({ params }: Props) {
           programId={game.id}
           initialComments={comments}
           commentsAvailable={commentsAvailable}
+          isAdmin={admin}
         />
       </main>
     </div>

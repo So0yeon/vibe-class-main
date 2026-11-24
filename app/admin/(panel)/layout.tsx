@@ -15,6 +15,9 @@ export default async function AdminPanelLayout({ children }: { children: React.R
           <Link href="/admin" className="text-slate-400 hover:text-slate-100">
             게임 목록
           </Link>
+          <Link href="/admin/comments" className="text-slate-400 hover:text-slate-100">
+            댓글
+          </Link>
           <Link href="/admin/about" className="text-slate-400 hover:text-slate-100">
             소개 섹션
           </Link>

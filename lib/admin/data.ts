@@ -39,3 +39,45 @@ export async function getAboutForAdmin(): Promise<AboutContent> {
   if (error) throw new Error(`소개 섹션을 불러오지 못했습니다: ${error.message}`);
   return mapAboutRow(data as AboutRow | null);
 }
+
+export type AdminComment = {
+  id: number;
+  programId: string;
+  gameTitle: string | null;
+  nickname: string | null;
+  content: string;
+  createdAt: string;
+  reportCount: number;
+  hidden: boolean;
+};
+
+/** 최근 댓글 (신고로 자동 숨김된 것 포함) */
+export async function getRecentCommentsForAdmin(limit = 200): Promise<AdminComment[]> {
+  await requireAdmin();
+  const supabase = getSupabaseAdminClient();
+  const { data, error } = await supabase
+    .from("comments")
+    .select("id, program_id, nickname, content, created_at, report_count, hidden")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  if (error) throw new Error(`댓글을 불러오지 못했습니다: ${error.message}`);
+
+  const rows = data ?? [];
+  const ids = [...new Set(rows.map((r) => r.program_id as string))];
+  const titles = new Map<string, string>();
+  if (ids.length) {
+    const { data: games } = await supabase.from("games").select("id, title").in("id", ids);
+    for (const g of games ?? []) titles.set(g.id as string, g.title as string);
+  }
+
+  return rows.map((r) => ({
+    id: r.id as number,
+    programId: r.program_id as string,
+    gameTitle: titles.get(r.program_id as string) ?? null,
+    nickname: r.nickname as string | null,
+    content: r.content as string,
+    createdAt: r.created_at as string,
+    reportCount: r.report_count as number,
+    hidden: r.hidden as boolean,
+  }));
+}

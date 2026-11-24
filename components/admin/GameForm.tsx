@@ -85,7 +85,6 @@ export function GameForm({ game }: Props) {
   const [unit, setUnit] = useState(game?.unit ?? "");
   const [playTime, setPlayTime] = useState(game?.playTime ?? "");
   const [date, setDate] = useState(game?.date?.slice(0, 10) ?? new Date().toISOString().slice(0, 10));
-  const [priority, setPriority] = useState(String(game?.priority ?? 0));
   const [published, setPublished] = useState(game?.published ?? false);
   const [worksheets, setWorksheets] = useState<WorksheetFile[]>(game?.worksheets ?? []);
 
@@ -157,7 +156,6 @@ export function GameForm({ game }: Props) {
         tags,
         date,
         published,
-        priority: Number(priority) || 0,
         worksheets,
         grades,
         unit,
@@ -287,14 +285,6 @@ export function GameForm({ game }: Props) {
         </Field>
         <Field label="날짜">
           <input className={inputClass} type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-        </Field>
-        <Field label="우선순위" hint="숫자가 클수록 목록 앞에 나옵니다.">
-          <input
-            className={inputClass}
-            type="number"
-            value={priority}
-            onChange={(e) => setPriority(e.target.value)}
-          />
         </Field>
       </div>
 

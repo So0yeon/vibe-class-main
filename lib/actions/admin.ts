@@ -135,7 +135,6 @@ export type GameInput = {
   tags: string[];
   date: string;
   published: boolean;
-  priority: number;
   worksheets: WorksheetFile[];
   grades: string[];
   unit: string;
@@ -187,7 +186,6 @@ export async function saveGame(
     tags: cleanList(input.tags),
     date: date || null,
     published: input.published,
-    priority: Number.isFinite(input.priority) ? Math.trunc(input.priority) : 0,
     worksheets,
     grades: cleanList(input.grades),
     unit: input.unit.trim(),
@@ -216,9 +214,16 @@ export async function saveGame(
       ].filter((u): u is string => !!u && !kept.has(u));
     }
   } else {
+    // 새 게임은 목록 맨 위에 오도록 지금 가장 큰 순서값 + 1
+    const { data: top } = await supabase
+      .from("games")
+      .select("priority")
+      .order("priority", { ascending: false })
+      .limit(1)
+      .maybeSingle();
     const { data, error } = await supabase
       .from("games")
-      .insert(row)
+      .insert({ ...row, priority: (top?.priority ?? 0) + 1 })
       .select("id")
       .single();
     if (error || !data) return { error: `저장하지 못했습니다: ${error?.message}` };
@@ -268,6 +273,65 @@ export async function setGamePublished(
   if (error) return { error: `변경하지 못했습니다: ${error.message}` };
   updateTag(GAMES_CACHE_TAG);
   return { ok: true };
+}
+
+// ---------------------------------------------------------------------------
+// 목록 순서 (priority는 화면에 보이지 않는 내부 정렬값: 클수록 앞)
+// ---------------------------------------------------------------------------
+
+/** 관리자 목록에서 끌어다 놓은 순서를 그대로 저장한다 (맨 앞이 가장 큰 값) */
+export async function saveGameOrder(
+  orderedIds: string[],
+): Promise<{ ok: true } | { error: string }> {
+  await requireAdmin();
+
+  const supabase = getSupabaseAdminClient();
+  const { data: existing, error: readError } = await supabase
+    .from("games")
+    .select("id");
+  if (readError) return { error: `순서를 저장하지 못했습니다: ${readError.message}` };
+
+  // 목록을 연 뒤 다른 곳에서 추가/삭제된 게임이 있으면 덮어쓰지 않는다
+  const known = new Set((existing ?? []).map((r) => r.id as string));
+  const unique = new Set(orderedIds);
+  if (
+    unique.size !== orderedIds.length ||
+    orderedIds.length !== known.size ||
+    orderedIds.some((id) => !known.has(id))
+  ) {
+    return { error: "목록이 바뀌었습니다. 새로고침한 뒤 다시 시도해주세요." };
+  }
+
+  const total = orderedIds.length;
+  const { error } = await supabase
+    .from("games")
+    .upsert(orderedIds.map((id, i) => ({ id, priority: total - i })), {
+      onConflict: "id",
+    });
+  if (error) return { error: `순서를 저장하지 못했습니다: ${error.message}` };
+
+  updateTag(GAMES_CACHE_TAG);
+  return { ok: true };
+}
+
+/** 날짜(없으면 등록일)가 최근인 순서로 전체를 다시 정렬한다 */
+export async function resetGameOrderByDate(): Promise<
+  { ok: true } | { error: string }
+> {
+  await requireAdmin();
+
+  const { data, error } = await getSupabaseAdminClient()
+    .from("games")
+    .select("id, date, created_at");
+  if (error) return { error: `정렬하지 못했습니다: ${error.message}` };
+
+  const key = (r: { date: string | null; created_at: string }) =>
+    r.date ?? r.created_at.slice(0, 10);
+  const sorted = [...(data ?? [])].sort(
+    (a, b) =>
+      key(b).localeCompare(key(a)) || b.created_at.localeCompare(a.created_at),
+  );
+  return saveGameOrder(sorted.map((r) => r.id as string));
 }
 
 // ---------------------------------------------------------------------------

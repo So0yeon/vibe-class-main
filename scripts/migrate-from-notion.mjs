@@ -4,6 +4,7 @@
 //   node --env-file=.env.local scripts/migrate-from-notion.mjs --dry-run   # 미리보기만
 //   node --env-file=.env.local scripts/migrate-from-notion.mjs             # 실제 이전
 //   node --env-file=.env.local scripts/migrate-from-notion.mjs --overwrite # 이미 옮긴 항목도 다시 덮어쓰기
+//   node --env-file=.env.local scripts/migrate-from-notion.mjs --about-only # 소개 섹션만 (덮어씀)
 //
 // 필요한 환경변수: NOTION_TOKEN, NOTION_DATABASE_ID, (선택) NOTION_ABOUT_PAGE_ID,
 //                 NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
@@ -18,6 +19,7 @@ const NOTION_VERSION = "2022-06-28";
 const BUCKET = "media";
 const DRY_RUN = process.argv.includes("--dry-run");
 const OVERWRITE = process.argv.includes("--overwrite");
+const ABOUT_ONLY = process.argv.includes("--about-only");
 
 const P = {
   title: "제목",
@@ -44,7 +46,7 @@ function requireEnv(name) {
 }
 
 const NOTION_TOKEN = requireEnv("NOTION_TOKEN");
-const NOTION_DATABASE_ID = requireEnv("NOTION_DATABASE_ID");
+const NOTION_DATABASE_ID = ABOUT_ONLY ? "" : requireEnv("NOTION_DATABASE_ID");
 const SUPABASE_URL = requireEnv("NEXT_PUBLIC_SUPABASE_URL");
 const SERVICE_KEY = requireEnv("SUPABASE_SERVICE_ROLE_KEY");
 const ABOUT_PAGE_ID = process.env.NOTION_ABOUT_PAGE_ID;
@@ -241,7 +243,7 @@ async function migrateAbout() {
   }
 
   const { data: existing } = await supabase.from("site_about").select("id").eq("id", 1).maybeSingle();
-  if (existing && !OVERWRITE) {
+  if (existing && !OVERWRITE && !ABOUT_ONLY) {
     console.log("- 소개 섹션은 이미 있어서 건너뜁니다.");
     return 0;
   }
@@ -281,5 +283,5 @@ async function migrateAbout() {
 }
 
 if (DRY_RUN) console.log("※ 미리보기 모드 — 아무것도 저장하지 않습니다.\n");
-const failures = (await migrateGames()) + (await migrateAbout());
+const failures = (ABOUT_ONLY ? 0 : await migrateGames()) + (await migrateAbout());
 process.exit(failures ? 1 : 0);

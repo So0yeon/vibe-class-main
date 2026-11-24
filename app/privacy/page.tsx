@@ -1,17 +1,19 @@
+import Link from "next/link";
+
 export default function PrivacyPage() {
   return (
     <main className="max-w-3xl mx-auto p-6">
-      <a
+      <Link
         href="/"
         className="inline-block mb-6 text-sm text-slate-400 hover:text-slate-200 transition-colors"
       >
         ← Vibe Class 🐙 돌아가기
-      </a>
+      </Link>
       
     <h1 className="text-3xl font-bold mb-8">개인정보처리방침</h1>
 
     <p className="mb-8">
-      바이브클래스(이하 "본 서비스")는 개인정보 보호법 제30조에 따라
+      바이브클래스(이하 &ldquo;본 서비스&rdquo;)는 개인정보 보호법 제30조에 따라
       이용자의 개인정보를 보호하고 관련 고충을 처리하기 위하여 다음과 같이
       개인정보처리방침을 수립·공개합니다.
     </p>

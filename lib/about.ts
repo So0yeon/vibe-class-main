@@ -1,4 +1,4 @@
-const NOTION_VERSION = "2022-06-28";
+import { getSupabaseClient } from "@/lib/supabase";
 
 export type AboutContent = {
   title: string;
@@ -18,183 +18,45 @@ export const DEFAULT_ABOUT: AboutContent = {
   bannerImage: "/og-image.png",
 };
 
-type NotionRichText = { plain_text: string };
+/** 관리자 페이지가 저장할 때 updateTag(ABOUT_CACHE_TAG)로 캐시를 비운다 */
+export const ABOUT_CACHE_TAG = "about";
 
-type NotionBlock = {
-  id: string;
-  type: string;
-  has_children?: boolean;
-  paragraph?: { rich_text: NotionRichText[] };
-  heading_1?: { rich_text: NotionRichText[] };
-  heading_2?: { rich_text: NotionRichText[] };
-  heading_3?: { rich_text: NotionRichText[] };
-  bulleted_list_item?: { rich_text: NotionRichText[] };
-  numbered_list_item?: { rich_text: NotionRichText[] };
-  quote?: { rich_text: NotionRichText[] };
-  image?: { type: string; external?: { url: string }; file?: { url: string } };
+export type AboutRow = {
+  title: string;
+  paragraphs: string[] | null;
+  profile_image: string | null;
+  banner_image: string | null;
 };
 
-type NotionCover = {
-  type: string;
-  external?: { url: string };
-  file?: { url: string };
-};
-
-type NotionTitleProperty = {
-  type?: string;
-  title?: NotionRichText[];
-};
-
-function getNotionHeaders(token: string) {
+export function mapAboutRow(row: AboutRow | null): AboutContent {
+  if (!row) return DEFAULT_ABOUT;
+  const paragraphs = (row.paragraphs ?? []).filter((p) => p.trim());
   return {
-    Authorization: `Bearer ${token}`,
-    "Notion-Version": NOTION_VERSION,
-    "Content-Type": "application/json",
+    title: row.title.trim() || DEFAULT_ABOUT.title,
+    paragraphs: paragraphs.length ? paragraphs : DEFAULT_ABOUT.paragraphs,
+    profileImage: row.profile_image,
+    bannerImage: row.banner_image || DEFAULT_ABOUT.bannerImage,
   };
 }
 
-function richTextToPlain(rich?: NotionRichText[]): string {
-  return rich?.map((t) => t.plain_text).join("") ?? "";
-}
-
-function getCoverUrl(cover: NotionCover | null | undefined): string | null {
-  if (!cover) return null;
-  return cover.type === "external"
-    ? (cover.external?.url ?? null)
-    : (cover.file?.url ?? null);
-}
-
-function getImageBlockUrl(block: NotionBlock): string | null {
-  const img = block.image;
-  if (!img) return null;
-  return img.type === "external"
-    ? (img.external?.url ?? null)
-    : (img.file?.url ?? null);
-}
-
-function normalizeNotionPageId(value: string): string {
-  const compactValue = value.replace(/-/g, "");
-  const match = compactValue.match(/[0-9a-fA-F]{32}/);
-  return match?.[0] ?? value;
-}
-
-function getPageTitle(
-  properties: Record<string, unknown> | undefined,
-): string {
-  if (!properties) return "";
-
-  for (const property of Object.values(properties)) {
-    const titleProperty = property as NotionTitleProperty;
-    if (titleProperty.type === "title" || titleProperty.title) {
-      const title = richTextToPlain(titleProperty.title).trim();
-      if (title) return title;
-    }
-  }
-
-  return "";
-}
-
-function blockToParagraph(block: NotionBlock): string | null {
-  const type = block.type;
-  const data = block[type as keyof NotionBlock] as
-    | { rich_text?: NotionRichText[] }
-    | undefined;
-  if (!data?.rich_text) return null;
-  const text = richTextToPlain(data.rich_text).trim();
-  return text || null;
-}
-
-type BlocksData = {
-  bannerImage: string | null;
-  paragraphs: string[];
-};
-
-async function fetchBlocksData(
-  token: string,
-  blockId: string,
-): Promise<BlocksData> {
-  const allBlocks: NotionBlock[] = [];
-  let cursor: string | undefined;
-
-  do {
-    const url = new URL(
-      `https://api.notion.com/v1/blocks/${blockId}/children`,
-    );
-    url.searchParams.set("page_size", "100");
-    if (cursor) url.searchParams.set("start_cursor", cursor);
-
-    const res = await fetch(url.toString(), {
-      headers: getNotionHeaders(token),
-      next: { revalidate: 300 },
-    });
-
-    if (!res.ok) break;
-
-    const data = (await res.json()) as {
-      results: NotionBlock[];
-      has_more: boolean;
-      next_cursor: string | null;
-    };
-
-    allBlocks.push(...data.results);
-    cursor = data.has_more ? (data.next_cursor ?? undefined) : undefined;
-  } while (cursor);
-
-  const firstImageIndex = allBlocks.findIndex((b) => b.type === "image");
-  const bannerImage =
-    firstImageIndex >= 0 ? getImageBlockUrl(allBlocks[firstImageIndex]) : null;
-
-  const startIndex = firstImageIndex >= 0 ? firstImageIndex + 1 : 0;
-  const paragraphs: string[] = [];
-  for (const block of allBlocks.slice(startIndex)) {
-    const text = blockToParagraph(block);
-    if (text) paragraphs.push(text);
-  }
-
-  return { bannerImage, paragraphs };
-}
-
-/**
- * 별도 Notion 일반 페이지(NOTION_ABOUT_PAGE_ID)에서 소개 섹션을 불러옵니다.
- * - 제목: 페이지 Title
- * - Hero Banner: 본문 첫 번째 이미지 블록 (없으면 기본 배너)
- * - 내용: 첫 번째 이미지 블록 이후의 문단
- * - 프로필: 페이지 Cover 이미지(선택)
- */
-export async function getAboutFromNotion(): Promise<AboutContent> {
-  const token = process.env.NOTION_TOKEN;
-  const pageId = process.env.NOTION_ABOUT_PAGE_ID
-    ? normalizeNotionPageId(process.env.NOTION_ABOUT_PAGE_ID)
-    : undefined;
-
-  if (!token || !pageId) {
-    return DEFAULT_ABOUT;
-  }
+/** Supabase site_about(id = 1)에서 소개 섹션을 불러온다. 없거나 실패하면 기본 문구 */
+export async function getAbout(): Promise<AboutContent> {
+  const supabase = getSupabaseClient({
+    revalidateSeconds: 300,
+    tags: [ABOUT_CACHE_TAG],
+  });
+  if (!supabase) return DEFAULT_ABOUT;
 
   try {
-    const pageRes = await fetch(`https://api.notion.com/v1/pages/${pageId}`, {
-      headers: getNotionHeaders(token),
-      next: { revalidate: 300 },
-    });
-
-    if (!pageRes.ok) return DEFAULT_ABOUT;
-
-    const page = (await pageRes.json()) as {
-      properties?: Record<string, unknown>;
-      cover?: NotionCover | null;
-    };
-
-    const title = getPageTitle(page.properties) || DEFAULT_ABOUT.title;
-    const { bannerImage, paragraphs } = await fetchBlocksData(token, pageId);
-    const profileImage = getCoverUrl(page.cover ?? undefined);
-
-    return {
-      title,
-      paragraphs: paragraphs.length > 0 ? paragraphs : DEFAULT_ABOUT.paragraphs,
-      profileImage,
-      bannerImage: bannerImage ?? DEFAULT_ABOUT.bannerImage,
-    };
-  } catch {
+    const { data, error } = await supabase
+      .from("site_about")
+      .select("title, paragraphs, profile_image, banner_image")
+      .eq("id", 1)
+      .maybeSingle();
+    if (error) throw error;
+    return mapAboutRow(data as AboutRow | null);
+  } catch (e) {
+    console.error("getAbout failed:", e);
     return DEFAULT_ABOUT;
   }
 }

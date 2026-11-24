@@ -9,7 +9,7 @@ import {
   extractUnits,
   filterGames,
   type GameItem,
-} from "@/lib/notion";
+} from "@/lib/games";
 
 const PAGE_SIZE = 9;
 

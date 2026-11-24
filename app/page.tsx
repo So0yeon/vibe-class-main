@@ -1,18 +1,19 @@
 import { GameGallery } from "@/components/GameGallery";
 import { ScrollButtons } from "@/components/ScrollButtons";
 import { SiteHeader } from "@/components/SiteHeader";
-import { getAboutFromNotion } from "@/lib/about";
+import { getAbout } from "@/lib/about";
 import { getAllProgramStats } from "@/lib/community";
-import { getGamesFromNotion } from "@/lib/notion";
+import type { GameItem } from "@/lib/games";
+import { getPublishedGames } from "@/lib/games-data";
 
 export default async function Home() {
-  let games: Awaited<ReturnType<typeof getGamesFromNotion>> = [];
+  let games: GameItem[] = [];
   let error: string | null = null;
 
-  const about = await getAboutFromNotion();
+  const about = await getAbout();
 
   try {
-    games = await getGamesFromNotion();
+    games = await getPublishedGames();
   } catch (e) {
     error = e instanceof Error ? e.message : "데이터를 불러오지 못했습니다.";
   }
@@ -50,7 +51,7 @@ export default async function Home() {
           </div>
         ) : games.length === 0 ? (
           <p className="rounded-2xl border border-dashed border-slate-600/50 bg-slate-800/30 px-6 py-16 text-center text-sm text-slate-500">
-            공개된 게임이 없습니다. Notion에서 공개여부를 켠 항목만 표시됩니다.
+            공개된 게임이 없습니다. 관리자 페이지에서 공개로 설정한 항목만 표시됩니다.
           </p>
         ) : (
           <GameGallery

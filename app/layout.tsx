@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   title: SITE_TITLE,
   description: SITE_DESCRIPTION,
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://vibe-class-khaki.vercel.app",
+    process.env.NEXT_PUBLIC_SITE_URL || "https://vibe-class-main.vercel.app",
   ),
   openGraph: {
     title: SITE_TITLE,

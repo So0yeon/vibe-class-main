@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { ProgramStats } from "@/lib/community";
-import { buildMetaPills, formatGameDate, type GameItem } from "@/lib/notion";
+import { buildMetaPills, formatGameDate, type GameItem } from "@/lib/games";
 import { PlayButton } from "@/components/game/PlayButton";
 import { WorksheetLinks } from "@/components/game/WorksheetLinks";
 

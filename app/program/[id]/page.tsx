@@ -7,7 +7,8 @@ import { ProgramStats } from "@/components/community/ProgramStats";
 import { PlayButton } from "@/components/game/PlayButton";
 import { WorksheetLinks } from "@/components/game/WorksheetLinks";
 import { getComments, getProgramStats } from "@/lib/community";
-import { buildMetaPills, formatGameDate, getGameById } from "@/lib/notion";
+import { buildMetaPills, formatGameDate } from "@/lib/games";
+import { getGameById } from "@/lib/games-data";
 
 type Props = { params: Promise<{ id: string }> };
 

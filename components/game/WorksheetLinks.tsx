@@ -1,4 +1,4 @@
-import type { WorksheetFile } from "@/lib/notion";
+import type { WorksheetFile } from "@/lib/games";
 
 type Props = { worksheets: WorksheetFile[] };
 

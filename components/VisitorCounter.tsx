@@ -26,14 +26,19 @@ export function VisitorCounter() {
       .catch(() => {});
   }, []);
 
-  if (!stats) return null;
-
   return (
-    <p className="mt-2 flex items-center gap-1.5 font-mono text-[11px] text-slate-500 sm:text-xs">
-      <span aria-hidden>👁</span>
-      <span>오늘 {fmt(stats.today)}명</span>
-      <span aria-hidden className="opacity-40">·</span>
-      <span>누적 {fmt(stats.total)}명</span>
+    <p
+      className={`inline-flex items-center gap-2 font-mono text-[11px] text-fog transition-opacity duration-700 ${
+        stats ? "opacity-100" : "opacity-0"
+      }`}
+      aria-hidden={!stats}
+    >
+      <span className="relative flex h-1.5 w-1.5">
+        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-gold/70" />
+        <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-gold" />
+      </span>
+      오늘 {fmt(stats?.today ?? 0)}명<span className="opacity-40">/</span>
+      누적 {fmt(stats?.total ?? 0)}명
     </p>
   );
 }

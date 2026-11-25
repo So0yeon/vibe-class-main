@@ -66,11 +66,11 @@ export function CommentListItem({
   const displayName = comment.nickname?.trim() || "익명 선생님";
 
   return (
-    <li className="rounded-xl border border-slate-700/50 bg-slate-800/30 p-4">
+    <li className="rounded-2xl border border-line bg-ink-2/50 p-4 sm:p-5">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-slate-200">{displayName}</p>
-          <time dateTime={comment.createdAt} className="text-xs text-slate-500">
+          <p className="text-sm font-semibold text-ivory">{displayName}</p>
+          <time dateTime={comment.createdAt} className="text-xs text-fog">
             {formatCommentDate(comment.createdAt)}
           </time>
         </div>
@@ -82,13 +82,13 @@ export function CommentListItem({
               onClick={() => setMenuOpen((v) => !v)}
               aria-label="댓글 메뉴 열기"
               aria-expanded={menuOpen}
-              className="rounded-md px-2 py-1 text-slate-500 transition hover:bg-slate-700/50 hover:text-slate-300"
+              className="rounded-md px-2 py-1 text-fog transition hover:bg-white/5 hover:text-ivory/90"
             >
               ⋯
             </button>
 
             {menuOpen && (
-              <div className="community-menu-pop absolute right-0 top-full z-10 mt-1 w-32 overflow-hidden rounded-lg border border-slate-600/50 bg-slate-900 shadow-lg">
+              <div className="community-menu-pop absolute right-0 top-full z-10 mt-1 w-32 overflow-hidden rounded-lg border border-line-strong bg-ink-3 shadow-[0_20px_40px_-12px_rgba(0,0,0,0.8)]">
                 <button
                   type="button"
                   disabled={alreadyReported}
@@ -96,7 +96,7 @@ export function CommentListItem({
                     onReport(comment.id);
                     setMenuOpen(false);
                   }}
-                  className="block w-full px-3 py-2 text-left text-sm text-slate-300 transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:text-slate-600"
+                  className="block w-full px-3 py-2 text-left text-sm text-ivory/90 transition hover:bg-white/5 disabled:cursor-not-allowed disabled:text-fog/60"
                 >
                   {alreadyReported ? "신고 접수됨" : "신고하기"}
                 </button>
@@ -107,7 +107,7 @@ export function CommentListItem({
                     setDeleteError(null);
                     setMenuOpen(false);
                   }}
-                  className="block w-full px-3 py-2 text-left text-sm text-slate-300 transition hover:bg-slate-800"
+                  className="block w-full px-3 py-2 text-left text-sm text-ivory/90 transition hover:bg-white/5"
                 >
                   삭제하기
                 </button>
@@ -119,7 +119,7 @@ export function CommentListItem({
                       if (confirm("이 댓글을 삭제할까요? (관리자)"))
                         runDelete(null);
                     }}
-                    className="block w-full px-3 py-2 text-left text-sm text-red-300 transition hover:bg-slate-800"
+                    className="block w-full px-3 py-2 text-left text-sm text-red-300 transition hover:bg-white/5"
                   >
                     관리자 삭제
                   </button>
@@ -130,13 +130,13 @@ export function CommentListItem({
         )}
       </div>
 
-      <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-relaxed text-slate-300">
+      <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-relaxed text-ivory/90">
         {comment.content}
       </p>
 
       {deleteOpen && (
         <form
-          className="mt-3 flex flex-wrap items-center gap-2 border-t border-slate-700/50 pt-3"
+          className="mt-3 flex flex-wrap items-center gap-2 border-t border-line pt-3"
           onSubmit={(e) => {
             e.preventDefault();
             runDelete(password);
@@ -150,7 +150,7 @@ export function CommentListItem({
             autoComplete="off"
             autoFocus
             disabled={deleting}
-            className="min-w-0 flex-1 rounded-lg border border-slate-600/50 bg-slate-900/50 px-3 py-1.5 text-sm text-slate-200 placeholder:text-slate-500 focus:border-cyan-500/50 focus:outline-none disabled:opacity-50"
+            className="min-w-0 flex-1 rounded-xl border border-line bg-ink/60 px-3 py-1.5 text-sm text-ivory placeholder:text-fog focus:border-gold/50 focus:outline-none disabled:opacity-50"
           />
           <button
             type="submit"
@@ -166,7 +166,7 @@ export function CommentListItem({
               setPassword("");
               setDeleteError(null);
             }}
-            className="px-2 py-1.5 text-sm text-slate-500 hover:text-slate-300"
+            className="px-2 py-1.5 text-sm text-fog hover:text-ivory/90"
           >
             취소
           </button>

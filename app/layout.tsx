@@ -1,6 +1,12 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import {
+  Geist,
+  Geist_Mono,
+  Gowun_Batang,
+  Instrument_Serif,
+} from "next/font/google";
 import { CloudflareAnalytics } from "@/components/CloudflareAnalytics";
+import { Toaster } from "@/components/ui/Toaster";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,11 +19,28 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const instrumentSerif = Instrument_Serif({
+  variable: "--font-instrument",
+  weight: "400",
+  style: ["normal", "italic"],
+  subsets: ["latin"],
+});
+
+// 한글 서체는 Google Fonts에 korean 서브셋 지정이 없어 preload 없이 unicode-range로 나눠 받는다
+const gowunBatang = Gowun_Batang({
+  variable: "--font-gowun",
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  preload: false,
+});
+
 const SITE_TITLE = "Vibe Class │ 수업에 바이브를 더하다";
 const SITE_DESCRIPTION = "교실에서 바로 쓰는 웹앱 수업자료 아카이브";
-const COPYRIGHT_NOTICE = "© Vibe Class. All Rights Reserved.";
-const OG_IMAGE =
-  "https://github.com/So0yeon/vibe-class/raw/main/og-image.png";
+const OG_IMAGE = "https://github.com/So0yeon/vibe-class/raw/main/og-image.png";
+
+export const viewport: Viewport = {
+  themeColor: "#0a0f0d",
+};
 
 export const metadata: Metadata = {
   title: SITE_TITLE,
@@ -56,23 +79,11 @@ export default function RootLayout({
   return (
     <html
       lang="ko"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} ${gowunBatang.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col bg-[#0f172a] text-slate-200">
+      <body className="flex min-h-full flex-col bg-ink text-ivory">
         {children}
-
-        <footer className="mt-auto py-6 text-center">
-          <a
-            href="/privacy"
-            className="text-sm text-slate-400 transition-colors hover:text-slate-200"
-          >
-            개인정보처리방침
-          </a>
-          <p className="pointer-events-none mt-3 text-[11px] text-slate-400 opacity-50">
-            {COPYRIGHT_NOTICE}
-          </p>
-        </footer>
-
+        <Toaster />
         <CloudflareAnalytics />
       </body>
     </html>

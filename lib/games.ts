@@ -45,7 +45,7 @@ export const SUBJECT_ORDER = [
   "미술",
   "체육",
   "실과",
-  "창의",
+  "창체",
   "통합",
 ];
 

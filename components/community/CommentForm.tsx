@@ -34,7 +34,7 @@ export function CommentForm({ onSubmit, pending, error }: Props) {
   };
 
   return (
-    <div className="rounded-xl border border-slate-600/50 bg-slate-800/40 p-4">
+    <div className="rounded-3xl border border-line bg-ink-2/70 p-4 sm:p-5">
       <div className="mb-2 grid gap-2 sm:grid-cols-2">
         <input
           type="text"
@@ -45,7 +45,7 @@ export function CommentForm({ onSubmit, pending, error }: Props) {
           placeholder="닉네임 (선택, 비워두면 익명 선생님)"
           disabled={pending}
           maxLength={NICKNAME_MAX_LENGTH}
-          className="w-full rounded-lg border border-slate-600/50 bg-slate-900/50 px-3 py-2 text-sm text-slate-200 placeholder:text-slate-500 transition focus:border-cyan-500/50 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 disabled:opacity-50"
+          className="w-full rounded-xl border border-line bg-ink/60 px-3 py-2 text-sm text-ivory placeholder:text-fog transition focus:border-gold/50 focus:outline-none focus:ring-4 focus:ring-gold/10 disabled:opacity-50"
         />
         <input
           type="password"
@@ -57,7 +57,7 @@ export function CommentForm({ onSubmit, pending, error }: Props) {
           autoComplete="new-password"
           disabled={pending}
           maxLength={PASSWORD_MAX_LENGTH}
-          className="w-full rounded-lg border border-slate-600/50 bg-slate-900/50 px-3 py-2 text-sm text-slate-200 placeholder:text-slate-500 transition focus:border-cyan-500/50 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 disabled:opacity-50"
+          className="w-full rounded-xl border border-line bg-ink/60 px-3 py-2 text-sm text-ivory placeholder:text-fog transition focus:border-gold/50 focus:outline-none focus:ring-4 focus:ring-gold/10 disabled:opacity-50"
         />
       </div>
       <textarea
@@ -70,17 +70,17 @@ export function CommentForm({ onSubmit, pending, error }: Props) {
         disabled={pending}
         rows={3}
         maxLength={CONTENT_MAX_LENGTH}
-        className="w-full resize-none rounded-lg border border-slate-600/50 bg-slate-900/50 px-3 py-2 text-sm text-slate-200 placeholder:text-slate-500 transition focus:border-cyan-500/50 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 disabled:opacity-50"
+        className="w-full resize-none rounded-xl border border-line bg-ink/60 px-3 py-2 text-sm text-ivory placeholder:text-fog transition focus:border-gold/50 focus:outline-none focus:ring-4 focus:ring-gold/10 disabled:opacity-50"
       />
       <div className="mt-2 flex items-center justify-between gap-3">
-        <span className="text-xs text-slate-500">
+        <span className="text-xs text-fog">
           {content.length}/{CONTENT_MAX_LENGTH}
         </span>
         <button
           type="button"
           onClick={submit}
           disabled={!canSubmit}
-          className="inline-flex items-center gap-2 rounded-lg border border-cyan-500/40 bg-cyan-500/10 px-4 py-2 text-sm font-medium text-cyan-300 transition hover:border-cyan-400/60 hover:bg-cyan-500/20 hover:text-cyan-200 disabled:cursor-not-allowed disabled:opacity-40"
+          className="inline-flex items-center gap-2 rounded-full bg-ivory px-5 py-2 text-sm font-semibold text-ink transition hover:bg-gold-soft disabled:cursor-not-allowed disabled:opacity-40"
         >
           {pending ? "게시 중…" : "댓글 등록"}
         </button>

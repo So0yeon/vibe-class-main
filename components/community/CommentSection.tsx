@@ -27,10 +27,7 @@ function rememberReportedId(id: number) {
   try {
     const ids = new Set(getReportedIds());
     ids.add(id);
-    window.localStorage.setItem(
-      REPORTED_STORAGE_KEY,
-      JSON.stringify([...ids]),
-    );
+    window.localStorage.setItem(REPORTED_STORAGE_KEY, JSON.stringify([...ids]));
   } catch {
     // localStorage를 쓸 수 없는 환경(사생활 보호 모드 등) - 조용히 무시
   }
@@ -118,10 +115,18 @@ export function CommentSection({
   };
 
   return (
-    <section className="mt-8">
-      <h2 className="mb-4 text-lg font-semibold text-slate-100">
-        💬 댓글 {comments.length.toLocaleString("ko-KR")}개
-      </h2>
+    <section>
+      <div className="mb-6 flex items-end justify-between gap-4">
+        <div>
+          <p className="eyebrow">Notes from teachers</p>
+          <h2 className="mt-2 font-display text-3xl text-ivory sm:text-4xl">
+            선생님들의 <em className="text-gold">한마디</em>
+          </h2>
+        </div>
+        <p className="font-mono text-sm text-fog tabular-nums">
+          {comments.length.toLocaleString("ko-KR")}개
+        </p>
+      </div>
 
       {commentsAvailable && (
         <div className="mb-6">
@@ -134,11 +139,11 @@ export function CommentSection({
       )}
 
       {!commentsAvailable ? (
-        <p className="rounded-xl border border-dashed border-slate-600/50 bg-slate-800/30 px-6 py-10 text-center text-sm text-slate-500">
+        <p className="rounded-3xl border border-dashed border-line-strong px-6 py-10 text-center text-sm text-fog">
           댓글을 불러올 수 없습니다. 잠시 후 다시 시도해주세요.
         </p>
       ) : comments.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-slate-600/50 bg-slate-800/30 px-6 py-10 text-center text-sm text-slate-500">
+        <p className="rounded-3xl border border-dashed border-line-strong px-6 py-10 text-center text-sm text-fog">
           아직 댓글이 없어요. 첫 댓글을 남겨보세요!
         </p>
       ) : (

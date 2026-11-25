@@ -1,27 +1,40 @@
-type Props = { url: string | null };
+import { ArrowUpRight } from "lucide-react";
 
-export function PlayButton({ url }: Props) {
-  const href = url ?? "#";
+type Props = { url: string | null; size?: "md" | "lg" };
+
+export function PlayButton({ url, size = "md" }: Props) {
   const isExternal = Boolean(url);
+  const sizeClass =
+    size === "lg" ? "px-6 py-3.5 text-[15px]" : "px-4 py-2.5 text-sm";
+
+  if (!isExternal) {
+    return (
+      <span
+        aria-disabled
+        className={`inline-flex items-center justify-center gap-2 rounded-full border border-line text-fog ${sizeClass}`}
+      >
+        서버 한도 도달 · 잠시 후 다시 열려요
+      </span>
+    );
+  }
 
   return (
     <a
-      href={href}
-      target={isExternal ? "_blank" : undefined}
-      rel={isExternal ? "noopener noreferrer" : undefined}
-      aria-disabled={!isExternal}
-      className="inline-flex items-center justify-center gap-2 rounded-lg border border-cyan-500/40 bg-cyan-500/10 px-4 py-2.5 text-sm font-medium text-cyan-300 transition hover:border-cyan-400/60 hover:bg-cyan-500/20 hover:text-cyan-200 hover:shadow-[0_0_20px_-4px_rgba(34,211,238,0.4)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-500/50 aria-disabled:pointer-events-none aria-disabled:opacity-40"
+      href={url!}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`group/play relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full bg-ivory font-semibold text-ink transition duration-500 hover:shadow-[0_10px_40px_-10px_rgba(214,180,122,0.7)] ${sizeClass}`}
     >
-      {isExternal ? (
-        <>
-          게임 열기
-          <span aria-hidden className="transition group-hover:translate-x-0.5">
-            →
-          </span>
-        </>
-      ) : (
-        "🚧 서버 한도 도달"
-      )}
+      <span
+        aria-hidden
+        className="absolute inset-0 -translate-x-full bg-gradient-to-r from-gold-soft via-gold to-gold-soft transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/play:translate-x-0"
+      />
+      <span className="relative">게임 열기</span>
+      <ArrowUpRight
+        aria-hidden
+        className="relative h-4 w-4 transition-transform duration-500 group-hover/play:-translate-y-0.5 group-hover/play:translate-x-0.5"
+        strokeWidth={2}
+      />
     </a>
   );
 }

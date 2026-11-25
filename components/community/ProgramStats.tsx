@@ -8,6 +8,7 @@ import {
   useSyncExternalStore,
   useTransition,
 } from "react";
+import { Eye, Heart } from "lucide-react";
 import { incrementView, likeProgram } from "@/lib/actions/community";
 
 const LIKED_STORAGE_KEY = "vibeclass:likedPrograms";
@@ -50,11 +51,7 @@ type Props = {
   initialLikes: number;
 };
 
-export function ProgramStats({
-  programId,
-  initialViews,
-  initialLikes,
-}: Props) {
+export function ProgramStats({ programId, initialViews, initialLikes }: Props) {
   const [views, setViews] = useState(initialViews);
   const [likes, setLikes] = useState(initialLikes);
   const [optimisticLiked, setOptimisticLiked] = useState(false);
@@ -106,23 +103,23 @@ export function ProgramStats({
         disabled={liked || isLikePending}
         aria-pressed={liked}
         aria-label={`좋아요 ${likes}개, ${liked ? "이미 눌렀습니다" : "누르기"}`}
-        className={`inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed ${
+        className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed ${
           liked
-            ? "border-rose-500/50 bg-rose-500/15 text-rose-300"
-            : "border-slate-600/50 bg-slate-800/40 text-slate-300 hover:border-rose-500/40 hover:bg-rose-500/10 hover:text-rose-300"
+            ? "border-garnet/60 bg-garnet/15 text-[#f3c3cd]"
+            : "border-line-strong text-mist hover:border-garnet/50 hover:text-ivory"
         }`}
       >
-        <span
+        <Heart
           aria-hidden
-          className={`inline-block ${isPopping ? "community-like-pop" : ""}`}
-        >
-          {liked ? "❤️" : "🤍"}
-        </span>
+          className={`h-4 w-4 ${isPopping ? "community-like-pop" : ""}`}
+          fill={liked ? "currentColor" : "none"}
+          strokeWidth={1.75}
+        />
         {likes.toLocaleString("ko-KR")}
       </button>
 
-      <span className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-400">
-        <span aria-hidden>👀</span>
+      <span className="inline-flex items-center gap-1.5 text-sm font-medium text-mist">
+        <Eye aria-hidden className="h-4 w-4" strokeWidth={1.75} />
         {views.toLocaleString("ko-KR")}
       </span>
 

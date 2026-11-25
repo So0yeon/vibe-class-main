@@ -1,129 +1,171 @@
+"use client";
+
+import { Clock, Eye, Heart, MessageCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import type { ProgramStats } from "@/lib/community";
-import { buildMetaPills, formatGameDate, type GameItem } from "@/lib/games";
+import { ViewTransition } from "react";
+import { FavoriteButton } from "@/components/game/FavoriteButton";
 import { PlayButton } from "@/components/game/PlayButton";
 import { WorksheetLinks } from "@/components/game/WorksheetLinks";
+import type { ProgramStats } from "@/lib/community";
+import { formatGameDate, type GameItem } from "@/lib/games";
+import { useInteractiveCard } from "@/lib/use-interactive-card";
 
 type Props = { game: GameItem; stats?: ProgramStats };
 
-const MAX_VISIBLE_TAGS = 3;
+const MAX_VISIBLE_TAGS = 2;
+
+function compact(n: number) {
+  return new Intl.NumberFormat("ko-KR", { notation: "compact" }).format(n);
+}
 
 export function GameCard({ game, stats }: Props) {
+  const { ref, onPointerMove, onPointerLeave } =
+    useInteractiveCard<HTMLElement>();
   const formattedDate = formatGameDate(game.date);
   const visibleTags = game.tags.slice(0, MAX_VISIBLE_TAGS);
-  const hiddenTags = game.tags.slice(MAX_VISIBLE_TAGS);
-  const metaPills = buildMetaPills(game);
-  const hasMeta = metaPills.length > 0;
+  const hiddenCount = game.tags.length - visibleTags.length;
+  const meta = [...game.grades, game.unit.trim()].filter(Boolean);
   const detailHref = `/program/${game.id}`;
 
   return (
-    <article className="card-neon-glow group relative flex h-full flex-col overflow-hidden rounded-2xl border border-slate-600/50 bg-[#1e293b] shadow-[0_4px_24px_-4px_rgba(0,0,0,0.5),inset_0_1px_0_0_rgba(255,255,255,0.06)]">
+    <article
+      ref={ref}
+      onPointerMove={onPointerMove}
+      onPointerLeave={onPointerLeave}
+      className="spotlight tilt group relative flex h-full flex-col rounded-[26px] border border-line bg-ink-2/80 p-2 shadow-[0_30px_60px_-30px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.04)] backdrop-blur-sm"
+    >
       <div className="relative z-10 flex h-full flex-col">
-        <Link
-          href={detailHref}
-          className="relative block aspect-[16/10] overflow-hidden bg-slate-800"
-        >
-          {game.thumbnail ? (
-            <>
-              <Image
-                src={game.thumbnail}
-                alt={game.title}
-                fill
-                className="object-cover transition duration-500 group-hover:scale-[1.04] group-hover:brightness-110"
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#1e293b] via-transparent to-transparent opacity-80" />
-            </>
-          ) : (
-            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900">
-              <span className="text-5xl opacity-60 transition group-hover:scale-110 group-hover:opacity-90">
-                🎮
-              </span>
-            </div>
-          )}
+        <div className="relative">
+          <Link
+            href={detailHref}
+            className="relative block aspect-[16/10] overflow-hidden rounded-[20px] bg-ink-3"
+            aria-label={`${game.title} 자세히 보기`}
+          >
+            <ViewTransition
+              name={`thumb-${game.id}`}
+              share="morph"
+              default="none"
+            >
+              <div className="absolute inset-0">
+                {game.thumbnail ? (
+                  <Image
+                    src={game.thumbnail}
+                    alt=""
+                    fill
+                    className="object-cover transition duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.06]"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  />
+                ) : (
+                  <div className="grid h-full w-full place-items-center bg-[radial-gradient(circle_at_30%_20%,#1f3a2f,#0f1613)]">
+                    <span className="font-display text-5xl italic text-gold/60">
+                      {game.title.slice(0, 1)}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </ViewTransition>
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/20" />
+          </Link>
 
           {game.tags.length > 0 && (
-            <div className="absolute left-3 top-3 z-10 flex max-w-[calc(100%-1.5rem)] flex-wrap gap-1.5">
+            <div className="pointer-events-none absolute left-3 top-3 flex flex-wrap gap-1.5">
               {visibleTags.map((tag) => (
                 <span
                   key={tag}
-                  className="rounded-md border border-cyan-500/30 bg-slate-900/80 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-cyan-300 backdrop-blur-sm"
+                  className="rounded-full border border-white/15 bg-black/40 px-2.5 py-1 text-[11px] font-medium text-white/90 backdrop-blur-md"
                 >
                   {tag}
                 </span>
               ))}
-              {hiddenTags.length > 0 && (
+              {hiddenCount > 0 && (
                 <span
-                  className="cursor-default rounded-md border border-slate-500/40 bg-slate-900/80 px-2 py-0.5 text-[10px] font-medium text-slate-400 backdrop-blur-sm"
-                  title={hiddenTags.join(", ")}
+                  className="rounded-full border border-white/10 bg-black/40 px-2 py-1 text-[11px] text-white/60 backdrop-blur-md"
+                  title={game.tags.slice(MAX_VISIBLE_TAGS).join(", ")}
                 >
-                  +{hiddenTags.length}
+                  +{hiddenCount}
                 </span>
               )}
             </div>
           )}
-        </Link>
 
-        <div className="flex flex-1 flex-col gap-3 p-4 sm:p-5">
-          {formattedDate && (
-            <time
-              dateTime={game.date ?? undefined}
-              className="font-mono text-[11px] font-medium tracking-wider text-cyan-500/70 uppercase"
-            >
-              {formattedDate}
-            </time>
+          <div className="absolute right-3 top-3">
+            <FavoriteButton gameId={game.id} title={game.title} />
+          </div>
+
+          {game.playTime.trim() && (
+            <span className="pointer-events-none absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-black/45 px-2.5 py-1 text-[11px] text-white/85 backdrop-blur-md">
+              <Clock className="h-3 w-3" strokeWidth={2} aria-hidden />
+              {game.playTime.trim()}
+            </span>
           )}
+        </div>
 
-          <h2 className="line-clamp-2 text-lg font-semibold tracking-tight text-slate-100">
+        <div className="flex flex-1 flex-col px-3 pb-3 pt-4 sm:px-4">
+          <div className="flex items-center justify-between gap-3 text-[11px] text-fog">
+            {formattedDate ? (
+              <time
+                dateTime={game.date ?? undefined}
+                className="font-mono tracking-wider"
+              >
+                {formattedDate}
+              </time>
+            ) : (
+              <span />
+            )}
+            {stats && (
+              <span className="flex items-center gap-3 font-mono">
+                <span className="inline-flex items-center gap-1" title="좋아요">
+                  <Heart className="h-3 w-3" strokeWidth={2} aria-hidden />
+                  <span className="sr-only">좋아요</span>
+                  {compact(stats.likes)}
+                </span>
+                <span className="inline-flex items-center gap-1" title="조회수">
+                  <Eye className="h-3 w-3" strokeWidth={2} aria-hidden />
+                  <span className="sr-only">조회수</span>
+                  {compact(stats.views)}
+                </span>
+                <span className="inline-flex items-center gap-1" title="댓글">
+                  <MessageCircle
+                    className="h-3 w-3"
+                    strokeWidth={2}
+                    aria-hidden
+                  />
+                  <span className="sr-only">댓글</span>
+                  {compact(stats.commentCount)}
+                </span>
+              </span>
+            )}
+          </div>
+
+          <h2 className="mt-2.5 line-clamp-2 text-[17px] font-semibold leading-snug tracking-tight text-ivory">
             <Link
               href={detailHref}
-              className="transition hover:text-white group-hover:text-white"
+              className="bg-[linear-gradient(currentColor,currentColor)] bg-[length:0%_1px] bg-left-bottom bg-no-repeat transition-[background-size] duration-500 group-hover:bg-[length:100%_1px]"
             >
               {game.title}
             </Link>
           </h2>
 
-          {stats && (
-            <div className="flex flex-wrap items-center gap-3 text-xs font-medium text-slate-400">
-              <span className="inline-flex items-center gap-1">
-                <span aria-hidden>❤️</span>
-                {stats.likes.toLocaleString("ko-KR")}
-              </span>
-              <span className="inline-flex items-center gap-1">
-                <span aria-hidden>👀</span>
-                {stats.views.toLocaleString("ko-KR")}
-              </span>
-              <span className="inline-flex items-center gap-1">
-                <span aria-hidden>💬</span>
-                {stats.commentCount.toLocaleString("ko-KR")}
-              </span>
-            </div>
-          )}
-
-          {hasMeta && (
-            <div className="flex flex-wrap gap-1.5 sm:gap-2">
-              {metaPills.map((meta, index) => (
-                <span
-                  key={`${meta}-${index}`}
-                  className="max-w-full truncate rounded-md border border-cyan-500/30 bg-slate-900/70 px-2 py-1 text-[11px] font-medium leading-none text-cyan-200/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] sm:max-w-[12rem]"
-                  title={meta}
-                >
-                  {meta}
-                </span>
-              ))}
-            </div>
+          {meta.length > 0 && (
+            <p className="mt-1.5 truncate text-xs text-gold/80">
+              {meta.join("  ·  ")}
+            </p>
           )}
 
           {game.description && (
-            <p className="line-clamp-3 flex-1 text-sm leading-relaxed text-slate-400 group-hover:text-slate-300">
+            <p className="mt-3 line-clamp-2 flex-1 text-sm leading-relaxed text-mist">
               {game.description}
             </p>
           )}
 
-          <div className="mt-auto flex flex-col gap-2">
+          <div className="mt-5 flex flex-col gap-2">
             <PlayButton url={game.url} />
-            <WorksheetLinks worksheets={game.worksheets} />
+            {game.worksheets.length > 0 && (
+              <div className="grid gap-2">
+                <WorksheetLinks worksheets={game.worksheets} />
+              </div>
+            )}
           </div>
         </div>
       </div>

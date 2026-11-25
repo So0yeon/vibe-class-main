@@ -1,10 +1,18 @@
+import { BackToTop } from "@/components/BackToTop";
+import { VibeyCorner } from "@/components/vibey/VibeyCorner";
 import { GameGallery } from "@/components/GameGallery";
-import { ScrollButtons } from "@/components/ScrollButtons";
-import { SiteHeader } from "@/components/SiteHeader";
+import { Hero } from "@/components/hero/Hero";
+import { Marquee } from "@/components/hero/Marquee";
+import { SiteNav } from "@/components/nav/SiteNav";
+import { RecentlyViewed } from "@/components/RecentlyViewed";
+import { SiteFooter } from "@/components/SiteFooter";
+import { AdventCalendar } from "@/components/winter/AdventCalendar";
+import { Snowfall } from "@/components/winter/Snowfall";
 import { getAbout } from "@/lib/about";
 import { getAllProgramStats } from "@/lib/community";
-import type { GameItem } from "@/lib/games";
+import { extractSubjects, type GameItem } from "@/lib/games";
 import { getPublishedGames } from "@/lib/games-data";
+import { isWinterSeason, kstDateKey } from "@/lib/season";
 
 export default async function Home() {
   let games: GameItem[] = [];
@@ -21,49 +29,82 @@ export default async function Home() {
   const { stats: statsMap, available: statsAvailable } =
     await getAllProgramStats();
 
+  const today = kstDateKey();
+  const winter = isWinterSeason(today);
+
+  const totals =
+    games.length > 0
+      ? {
+          games: games.length,
+          views: games.reduce(
+            (sum, g) => sum + (statsMap[g.id]?.views ?? 0),
+            0,
+          ),
+          likes: games.reduce(
+            (sum, g) => sum + (statsMap[g.id]?.likes ?? 0),
+            0,
+          ),
+        }
+      : null;
+
+  const subjects = extractSubjects(games);
+  const marqueeWords = winter
+    ? [...subjects, "Merry Christmas", "Happy Teaching"]
+    : [...subjects, "Vibe Coding", "Happy Teaching"];
+
   return (
-    <div
-      id="page-top"
-      className="relative flex min-h-full flex-col overflow-hidden bg-[#0f172a] text-slate-200"
-    >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -left-32 top-0 h-[480px] w-[480px] rounded-full bg-cyan-500/10 blur-[120px]"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -right-24 top-1/3 h-[400px] w-[400px] rounded-full bg-violet-600/10 blur-[100px]"
-      />
-      <div
-        aria-hidden
-        className="bg-tech-grid pointer-events-none absolute inset-0 opacity-60"
-      />
+    <div className="grain relative flex min-h-full flex-col overflow-x-clip">
+      <div aria-hidden className="aurora h-[120vh]" />
+      {winter && <Snowfall />}
 
-      <SiteHeader about={about} />
+      <SiteNav about={about} games={games} winter={winter} />
 
-      <main className="relative mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
-        {error ? (
-          <div
-            role="alert"
-            className="rounded-xl border border-red-500/30 bg-red-950/40 px-4 py-3 text-sm text-red-300 shadow-[0_0_24px_-8px_rgba(239,68,68,0.3)]"
-          >
-            {error}
-          </div>
-        ) : games.length === 0 ? (
-          <p className="rounded-2xl border border-dashed border-slate-600/50 bg-slate-800/30 px-6 py-16 text-center text-sm text-slate-500">
-            공개된 게임이 없습니다. 관리자 페이지에서 공개로 설정한 항목만 표시됩니다.
-          </p>
-        ) : (
-          <GameGallery
-            games={games}
-            statsMap={statsMap}
-            statsAvailable={statsAvailable}
-          />
+      <main className="relative flex-1">
+        <Hero
+          about={about}
+          winter={winter}
+          today={today}
+          totals={statsAvailable ? totals : null}
+        />
+
+        <Marquee words={marqueeWords} />
+
+        {winter && games.length > 0 && (
+          <AdventCalendar games={games} serverToday={today} />
         )}
+
+        <div
+          className={`mx-auto w-full max-w-6xl px-4 pb-24 sm:px-6 lg:px-8 ${
+            winter ? "pt-6" : "pt-20 sm:pt-28"
+          }`}
+        >
+          <RecentlyViewed games={games} />
+
+          {error ? (
+            <div
+              role="alert"
+              className="rounded-2xl border border-garnet/40 bg-garnet/10 px-5 py-4 text-sm text-[#f3c3cd]"
+            >
+              {error}
+            </div>
+          ) : games.length === 0 ? (
+            <p className="rounded-[28px] border border-dashed border-line-strong px-6 py-20 text-center text-sm text-mist">
+              공개된 게임이 없습니다. 관리자 페이지에서 공개로 설정한 항목만
+              표시됩니다.
+            </p>
+          ) : (
+            <GameGallery
+              games={games}
+              statsMap={statsMap}
+              statsAvailable={statsAvailable}
+            />
+          )}
+        </div>
       </main>
 
-      <div id="page-bottom" className="h-px shrink-0" aria-hidden />
-      <ScrollButtons />
+      <SiteFooter winter={winter} />
+      <BackToTop />
+      <VibeyCorner />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import "server-only";
 import { requireAdmin } from "@/lib/admin/auth";
 import { mapAboutRow, type AboutContent, type AboutRow } from "@/lib/about";
-import type { GameItem } from "@/lib/games";
+import { extractSubjects, type GameItem } from "@/lib/games";
 import { GAME_COLUMNS, mapGameRow, type GameRow } from "@/lib/games-data";
 import { getSupabaseAdminClient } from "@/lib/supabase-admin";
 
@@ -80,4 +80,9 @@ export async function getRecentCommentsForAdmin(limit = 200): Promise<AdminComme
     reportCount: r.report_count as number,
     hidden: r.hidden as boolean,
   }));
+}
+
+/** 게임 수정 화면의 과목 선택지: 지금 쓰이는 모든 태그 (기본 과목 순서 우선) */
+export async function getKnownTagsForAdmin(): Promise<string[]> {
+  return extractSubjects(await getAllGamesForAdmin());
 }

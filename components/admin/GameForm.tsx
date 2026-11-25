@@ -13,7 +13,11 @@ import {
 import { FileDrop } from "@/components/admin/FileDrop";
 import { uploadFile } from "@/components/admin/upload";
 
-type Props = { game: GameItem | null };
+type Props = {
+  game: GameItem | null;
+  /** 다른 게임들에서 이미 쓰고 있는 과목 태그 (선택지로 보여줌) */
+  knownTags?: string[];
+};
 
 const inputClass =
   "w-full rounded-lg border border-slate-600 bg-slate-900/60 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:outline-none";
@@ -70,7 +74,7 @@ function ChipToggle({
   );
 }
 
-export function GameForm({ game }: Props) {
+export function GameForm({ game, knownTags = [] }: Props) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [message, setMessage] = useState<{ kind: "ok" | "error"; text: string } | null>(null);
@@ -91,7 +95,7 @@ export function GameForm({ game }: Props) {
   const [uploadingThumb, setUploadingThumb] = useState(false);
   const [uploadingSheets, setUploadingSheets] = useState(0);
 
-  const subjectOptions = [...new Set([...SUBJECT_ORDER, ...tags])];
+  const subjectOptions = [...new Set([...SUBJECT_ORDER, ...knownTags, ...tags])];
   const gradeOptions = [...new Set([...GRADE_ORDER, ...grades])];
   const uploading = uploadingThumb || uploadingSheets > 0;
 

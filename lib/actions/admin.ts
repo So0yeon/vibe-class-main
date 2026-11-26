@@ -13,6 +13,7 @@ import {
 import { ABOUT_CACHE_TAG } from "@/lib/about";
 import { GAMES_CACHE_TAG } from "@/lib/games-data";
 import type { WorksheetFile } from "@/lib/games";
+import { kstDateKey } from "@/lib/season";
 import { getSupabaseAdminClient, MEDIA_BUCKET } from "@/lib/supabase-admin";
 
 // ---------------------------------------------------------------------------
@@ -88,7 +89,7 @@ export async function createUploadUrl(input: {
   // Storage 경로에는 한글을 쓸 수 없으므로 무작위 이름 + 확장자만 사용한다.
   // 활동지의 원래 파일명은 DB(worksheets[].name)에 따로 저장한다.
   const safeExt = /^[a-z0-9]{1,8}$/.test(ext) ? `.${ext}` : "";
-  const month = new Date().toISOString().slice(0, 7);
+  const month = kstDateKey().slice(0, 7);
   const path = `${input.kind}/${month}/${crypto.randomUUID()}${safeExt}`;
 
   const supabase = getSupabaseAdminClient();

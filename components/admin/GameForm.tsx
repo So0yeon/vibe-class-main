@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { deleteGame, saveGame } from "@/lib/actions/admin";
+import { kstDateKey } from "@/lib/season";
 import {
   GRADE_ORDER,
   SUBJECT_ORDER,
@@ -88,7 +89,7 @@ export function GameForm({ game, knownTags = [] }: Props) {
   const [grades, setGrades] = useState<string[]>(game?.grades ?? ["전학년"]);
   const [unit, setUnit] = useState(game?.unit ?? "");
   const [playTime, setPlayTime] = useState(game?.playTime ?? "");
-  const [date, setDate] = useState(game?.date?.slice(0, 10) ?? new Date().toISOString().slice(0, 10));
+  const [date, setDate] = useState(game?.date?.slice(0, 10) ?? kstDateKey());
   const [published, setPublished] = useState(game?.published ?? false);
   const [worksheets, setWorksheets] = useState<WorksheetFile[]>(game?.worksheets ?? []);
 

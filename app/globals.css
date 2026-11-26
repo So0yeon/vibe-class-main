@@ -1,5 +1,51 @@
 @import "tailwindcss";
 
+/* ───────────────────────── 한글 웹폰트 ─────────────────────────
+ * 고도: 단정한 본문 / 국민대 성곡: 품격 있는 제목
+ * 뚝딱감자: 바이비의 귀여운 말투 / 춤추는 사람들: 어드벤트의 둥글둥글한 축제 분위기
+ */
+@font-face {
+  font-family: "Godo";
+  src:
+    url("https://cdn.jsdelivr.net/korean-webfonts/1/corps/godo/Godo/GodoM.woff2")
+      format("woff2"),
+    url("https://cdn.jsdelivr.net/korean-webfonts/1/corps/godo/Godo/GodoM.woff")
+      format("woff");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Godo";
+  src:
+    url("https://cdn.jsdelivr.net/korean-webfonts/1/corps/godo/Godo/GodoB.woff2")
+      format("woff2"),
+    url("https://cdn.jsdelivr.net/korean-webfonts/1/corps/godo/Godo/GodoB.woff")
+      format("woff");
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: "KookminUniversitySunggokSerif";
+  src: url("https://cdn.jsdelivr.net/gh/Project-Noonnu/2607101542@kmu80sungkokserif/kmu80sungkokserif/KMU80SungkokSerif.woff2")
+    format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "TtukttakGamja";
+  src: url("https://cdn.jsdelivr.net/gh/Project-Noonnu/2610081905@tuktakpotato/tuktakpotato/tuktakpotato.woff2")
+    format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "DancingPeopleVariable";
+  src: url("https://cdn.jsdelivr.net/gh/Project-Noonnu/2610082345@dancingpeoples-dance-vf/dancingpeoples-dance-vf/DancingPeoples-Dance-VF.woff2")
+    format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+
 /*
  * Vibe Class — Winter Edition
  * 깊은 상록(ink) 위에 아이보리 텍스트, 샴페인 골드 포인트, 가넷은 아주 조금만.
@@ -19,12 +65,17 @@
   --color-garnet: #b9415a;
   --color-pine: #2f5c49;
 
-  --font-sans: var(--font-geist-sans), "Apple SD Gothic Neo", "Malgun Gothic",
+  /* 라틴 글자는 Geist, 한글은 고도로 자연스럽게 폴백 */
+  --font-sans:
+    var(--font-geist-sans), "Godo", "Apple SD Gothic Neo", "Malgun Gothic",
     system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
-  /* 라틴 글자는 Instrument Serif, 한글은 고운바탕으로 자연스럽게 폴백 */
-  --font-display: var(--font-instrument), var(--font-gowun), serif;
-  --font-serif-kr: var(--font-gowun), serif;
+  /* 라틴 글자는 Instrument Serif, 한글은 국민대 성곡으로 자연스럽게 폴백 */
+  --font-display:
+    var(--font-instrument), "KookminUniversitySunggokSerif", serif;
+  --font-serif-kr: "KookminUniversitySunggokSerif", serif;
+  --font-cute: "TtukttakGamja", var(--font-sans);
+  --font-round: "DancingPeopleVariable", var(--font-sans);
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -274,8 +325,8 @@ body {
 }
 
 .tilt {
-  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg))
-    translateY(var(--lift, 0px));
+  transform: perspective(900px) rotateX(var(--rx, 0deg))
+    rotateY(var(--ry, 0deg)) translateY(var(--lift, 0px));
   transition: transform 0.6s var(--ease-out-expo);
   will-change: transform;
 }
@@ -507,4 +558,15 @@ body {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* 굵기가 하나뿐인 서체는 가짜 볼드로 뭉개지지 않게 한다 */
+.font-serif-kr,
+.font-cute,
+.font-round {
+  font-synthesis-weight: none;
+}
+
+.font-round {
+  font-variation-settings: "DANC" 50;
 }

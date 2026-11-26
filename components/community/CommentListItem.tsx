@@ -6,6 +6,7 @@ import type { CommentItem } from "@/lib/community";
 function formatCommentDate(iso: string): string {
   try {
     return new Intl.DateTimeFormat("ko-KR", {
+      timeZone: "Asia/Seoul",
       year: "numeric",
       month: "long",
       day: "numeric",

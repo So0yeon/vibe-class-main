@@ -177,7 +177,7 @@ function Wing({
 
 /**
  * 바이비와 함께하는 미니게임.
- * 넓은 화면: 양옆에 접힌 날개 → 펼치면 게임 목록 → 날개 안에서 실행.
+ * 넓은 화면: 오른쪽에 접힌 날개 → 펼치면 게임 목록 → 날개 안에서 실행.
  * 좁은 화면: 왼쪽 아래 바이비 버튼 → 같은 목록을 담은 패널.
  */
 export function VibeyCorner() {
@@ -191,10 +191,11 @@ export function VibeyCorner() {
 
   if (wide) {
     return (
-      <>
-        <Wing side="left" title="Vibey's Room" games={["pet"]} />
-        <Wing side="right" title="Play with Vibey" games={["catch", "jump"]} />
-      </>
+      <Wing
+        side="right"
+        title="Play with Vibey"
+        games={["pet", "catch", "jump"]}
+      />
     );
   }
 

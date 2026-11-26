@@ -72,16 +72,16 @@ export function AdventCalendar({ games, serverToday }: Props) {
         <div className="reveal grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
           <div className="lg:sticky lg:top-28 lg:self-start">
             <p className="eyebrow">Advent Calendar</p>
-            <h2 className="mt-3 font-display text-[44px] leading-[1.02] tracking-tight text-ivory sm:text-6xl">
+            <h2 className="mt-3 font-round text-[40px] leading-[1.1] text-ivory sm:text-[52px]">
               스물다섯 개의
               <br />
-              <em className="text-gold">작은 창문</em>
+              <em className="not-italic text-gold">작은 창문</em>
             </h2>
             <p className="mt-5 max-w-sm text-[15px] leading-relaxed text-mist">
               12월 1일부터 크리스마스까지, 매일 하나씩 수업 선물이 들어 있는
               창문이 열립니다. 아침 조회 전에 오늘의 창문을 열어보세요.
             </p>
-            <p className="mt-6 inline-flex items-center gap-2 rounded-full border border-garnet/40 bg-garnet/10 px-4 py-2 text-sm text-[#f3c3cd]">
+            <p className="mt-6 inline-flex items-center gap-2 rounded-full border border-garnet/40 bg-garnet/10 px-4 py-2 font-round text-[15px] text-[#f3c3cd]">
               <span className="h-1.5 w-1.5 rounded-full bg-garnet" />
               {status}
             </p>

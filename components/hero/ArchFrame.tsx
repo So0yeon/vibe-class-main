@@ -60,8 +60,10 @@ export function ArchFrame({ image, winter, serverToday }: Props) {
       />
 
       <div className="relative aspect-[4/5] overflow-hidden rounded-t-[999px] rounded-b-[28px] border border-line-strong bg-ink-3 shadow-[0_50px_100px_-40px_rgba(0,0,0,0.9)]">
+        {/* 가로로 긴 대문 그림의 오른쪽 끝(바이비)이 보이도록 오른쪽 정렬.
+            오른쪽 여유는 패럴랙스 이동폭(±9px)만큼만 남겨 끝이 덜 잘리게 한다 */}
         <div
-          className="absolute -inset-6 transition-transform duration-700 ease-out"
+          className="absolute -inset-y-6 -left-6 -right-3 transition-transform duration-700 ease-out"
           style={{ transform: "translate(var(--px), var(--py))" }}
         >
           <Image
@@ -70,7 +72,7 @@ export function ArchFrame({ image, winter, serverToday }: Props) {
             fill
             priority
             sizes="(max-width: 1024px) 80vw, 440px"
-            className="object-cover"
+            className="object-cover object-right"
           />
         </div>
         {/* 성에 낀 유리 + 아래쪽 어둠 */}

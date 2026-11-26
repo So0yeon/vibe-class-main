@@ -196,7 +196,7 @@ create policy "site_visits_public_read" on public.site_visits
 
 grant select on public.site_visits to anon, authenticated;
 
--- 방문 기록: 오늘 날짜 카운트를 +1 하고 오늘/누적 집계를 반환
+-- 방문 기록 (날짜는 한국 시간 기준): 오늘 날짜 카운트를 +1 하고 오늘/누적 집계를 반환
 create or replace function public.record_site_visit()
 returns table (today_count integer, total_count integer)
 language plpgsql
@@ -207,7 +207,7 @@ declare
   v_today integer;
   v_total integer;
 begin
-  insert into public.site_visits (date, count) values (current_date, 1)
+  insert into public.site_visits (date, count) values ((now() at time zone 'Asia/Seoul')::date, 1)
   on conflict (date) do update set count = site_visits.count + 1
   returning site_visits.count into v_today;
 
@@ -229,7 +229,7 @@ as $$
 begin
   return query
   select
-    coalesce((select count from public.site_visits where date = current_date), 0)::integer,
+    coalesce((select count from public.site_visits where date = (now() at time zone 'Asia/Seoul')::date), 0)::integer,
     coalesce((select sum(count)::integer from public.site_visits), 0);
 end;
 $$;

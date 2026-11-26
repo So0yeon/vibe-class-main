@@ -79,7 +79,7 @@ export function ArcadeMenu({
                 />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block font-serif-kr text-sm font-bold text-ivory">
+                <span className="block font-cute text-[17px] leading-tight text-ivory">
                   {g.name}
                 </span>
                 <span className="mt-0.5 block truncate text-[10.5px] text-mist">

@@ -89,9 +89,7 @@ export function extractGrades(games: GameItem[]): string[] {
 export function matchesGradeFilter(game: GameItem, filter: string): boolean {
   if (filter === "전체") return true;
   if (filter === "전학년") return game.grades.includes("전학년");
-  return (
-    game.grades.includes(filter) || game.grades.includes("전학년")
-  );
+  return game.grades.includes(filter) || game.grades.includes("전학년");
 }
 
 /** 단원 필터 목록 (비어 있지 않은 단원만) */
@@ -151,6 +149,7 @@ export function formatGameDate(iso: string | null): string | null {
   if (!iso) return null;
   try {
     return new Intl.DateTimeFormat("ko-KR", {
+      timeZone: "Asia/Seoul",
       year: "numeric",
       month: "long",
       day: "numeric",

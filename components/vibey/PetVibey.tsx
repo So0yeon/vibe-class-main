@@ -93,7 +93,7 @@ export function PetVibey() {
   return (
     <div className="text-center">
       {/* 말풍선 */}
-      <div className="relative mx-auto min-h-[52px] max-w-[220px] rounded-2xl border border-line-strong bg-ink-3 px-3 py-2 text-xs leading-relaxed text-ivory">
+      <div className="relative mx-auto min-h-[52px] max-w-[220px] rounded-2xl border border-line-strong bg-ink-3 px-3 py-2 font-cute text-[15px] leading-snug text-ivory">
         <p key={line} className="fade-up">
           {line}
         </p>
@@ -131,9 +131,7 @@ export function PetVibey() {
         ))}
       </button>
 
-      <p className="mt-1 font-serif-kr text-sm font-bold text-ivory">
-        {stage.name}
-      </p>
+      <p className="mt-1 font-cute text-lg text-ivory">{stage.name}</p>
       <div className="mx-auto mt-2 h-1.5 max-w-[180px] overflow-hidden rounded-full bg-white/5">
         <div
           className="h-full rounded-full bg-gradient-to-r from-gold to-gold-soft transition-[width] duration-700"

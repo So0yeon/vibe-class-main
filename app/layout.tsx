@@ -1,10 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import {
-  Geist,
-  Geist_Mono,
-  Gowun_Batang,
-  Instrument_Serif,
-} from "next/font/google";
+import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
 import { CloudflareAnalytics } from "@/components/CloudflareAnalytics";
 import { Toaster } from "@/components/ui/Toaster";
 import "./globals.css";
@@ -24,14 +19,6 @@ const instrumentSerif = Instrument_Serif({
   weight: "400",
   style: ["normal", "italic"],
   subsets: ["latin"],
-});
-
-// 한글 서체는 Google Fonts에 korean 서브셋 지정이 없어 preload 없이 unicode-range로 나눠 받는다
-const gowunBatang = Gowun_Batang({
-  variable: "--font-gowun",
-  weight: ["400", "700"],
-  subsets: ["latin"],
-  preload: false,
 });
 
 const SITE_TITLE = "Vibe Class │ 수업에 바이브를 더하다";
@@ -79,7 +66,7 @@ export default function RootLayout({
   return (
     <html
       lang="ko"
-      className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} ${gowunBatang.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-ink text-ivory">
         {children}

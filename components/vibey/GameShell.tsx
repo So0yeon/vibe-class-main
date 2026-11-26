@@ -74,9 +74,7 @@ export function GameShell({
               </>
             ) : (
               <>
-                <p className="mt-2 font-serif-kr text-base font-bold text-ivory">
-                  {title}
-                </p>
+                <p className="mt-2 font-cute text-xl text-ivory">{title}</p>
                 <p className="mt-1 text-[11px] leading-relaxed text-mist">
                   {howTo}
                 </p>
